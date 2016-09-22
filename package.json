@@ -1,0 +1,61 @@
+{
+  "name": "paywell-bill",
+  "version": "0.1.0",
+  "description": "bills for paywell virtual wallet",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test",
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paywell/paywell-bill.git"
+  },
+  "keywords": [
+    "byteskode",
+    "paywell",
+    "wallet",
+    "bill",
+    "paycode"
+  ],
+  "author": {
+    "name": "lykmapipo",
+    "email": "lallyelias87@gmail.com",
+    "url": "https://github.com/lykmapipo"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paywell/paywell-bill/issues"
+  },
+  "homepage": "https://github.com/paywell/paywell-bill",
+  "devDependencies": {
+    "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
+    "express": "^4.14.0",
+    "faker": "^3.1.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-mocha-test": "^0.12.7",
+    "jshint-stylish": "^2.2.1",
+    "mocha": "^3.0.2",
+    "nock": "^8.0.0",
+    "supertest": "^2.0.0"
+  },
+  "dependencies": {
+    "async": "^2.0.1",
+    "kue": "^0.11.1",
+    "lodash": "^4.16.1",
+    "moment": "^2.15.1",
+    "paywell-redis": "^0.4.0",
+    "paywell-wallet": "^0.1.0",
+    "paywell-xml": "^0.1.0",
+    "phone": "git+https://github.com/lykmapipo/phone.git",
+    "redis": "^2.6.2",
+    "shortid": "^2.2.6",
+    "uuid": "^2.0.2",
+    "validator": "^5.6.0"
+  },
+  "engines": {
+    "node": ">= 6.5.0"
+  }
+}
