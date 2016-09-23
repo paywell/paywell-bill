@@ -205,6 +205,48 @@ describe('bill', function () {
       redis.clear(done);
     });
 
+    describe('without enough wallet balance', function () {
+      let reference;
+      before(function (done) {
+        redis.clear(done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(customerPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(vendorPhoneNumber, done);
+      });
+
+      before(function (done) {
+        const myBill = {
+          vendor: vendorPhoneNumber,
+          customer: customerPhoneNumber,
+          amount: 100,
+        };
+        bill.create(myBill, function (error, _bill) {
+          reference = _bill.reference;
+          done(error, _bill);
+        });
+      });
+
+      it(
+        'should be able to pay bill with pay reference',
+        function (done) {
+          bill.pay({ reference }, function (error, _bill) {
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill.paidAt).to.exist;
+            done(error, _bill);
+          });
+        });
+
+      after(function (done) {
+        redis.clear(done);
+      });
+    });
+
     describe('with enough wallet balance', function () {
       let paycode;
       before(function (done) {
@@ -256,6 +298,9 @@ describe('bill', function () {
       });
     });
 
+    it(
+      'should be ensure paycode or pay reference can used only once in case bill has due amount'
+    );
     it('should be able to pay bill by installments');
     it('should be able to notify bill about due');
     it('should be able to notify bill past due');
@@ -269,6 +314,12 @@ describe('bill', function () {
 
   describe('search', function () {
     it('should be able to search bill(s)');
+  });
+
+  describe('analytics', function () {
+    it('should be able to update total bill count so far');
+    it('should be able to update total bill paid count');
+    it('should be able to update total bill paid count');
   });
 
   after(function (done) {

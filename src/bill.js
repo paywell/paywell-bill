@@ -378,16 +378,17 @@ exports.pay = function (options, done) {
     },
 
     function payBill(_bill, next) {
+      const today = new Date();
+
+      //set paid date
+      _bill = _.merge({}, _bill, {
+        paidAt: today,
+        updatedAt: today
+      });
+
       //pay using paycode(wallet)
       if (_bill.paycode) {
         //TODO ensure same paycode?
-        const today = new Date();
-
-        //set paid date
-        _bill = _.merge({}, _bill, {
-          paidAt: today,
-          updatedAt: today
-        });
 
         const withdraw = {
           phoneNumber: _bill.customer.phoneNumber,
@@ -408,8 +409,11 @@ exports.pay = function (options, done) {
 
       //pay using reference
       //TODO implement
+      //TODO ensure there is topup or cash receipt
+      //TODO should we deposit then withdraw? To keep track of
+      //wallet deposit and withdraw
       else {
-        next(null, _bill);
+        exports.save(_bill, next);
       }
     },
 
