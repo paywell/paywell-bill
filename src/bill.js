@@ -114,3 +114,23 @@ exports.deserialize = function (bill) {
 
   return bill;
 };
+
+exports.paycode = function (done) {
+  //TODO should it be only number?
+  //TODO store them in redis set to ensure uniqueness
+  //TODO try use redis INCRBY to generate daily paycode
+  //TODO shuffle with wallet phone number to ensure per wallet unique paycode
+  exports.wallet.shortid(function (error, paycode) {
+    done(error, paycode);
+  });
+};
+
+exports.reference = function (done) {
+  //TODO should it be only number?
+  //TODO store them in redis set to ensure uniqueness
+  //TODO try use redis INCRBY to generate daily paycode
+  //TODO shuffle with wallet phone number to ensure per wallet unique paycode
+  exports.wallet.shortid(function (error, reference) {
+    done(error, reference);
+  });
+};

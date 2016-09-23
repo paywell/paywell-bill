@@ -19,11 +19,31 @@ describe('bill', function () {
   });
 
   describe('paycode', function () {
-    it('should be able to generate paycode');
+    it(
+      'should be able to generate paycode',
+      function (done) {
+        expect(bill.paycode).to.be.a.Function;
+        bill.paycode(function (error, paycode) {
+          expect(error).to.not.exist;
+          expect(paycode).to.exist;
+          expect(paycode).to.have.length(8);
+          done(error, paycode);
+        });
+      });
   });
 
   describe('reference', function () {
-    it('should be able to generate pay reference');
+    it(
+      'should be able to generate pay reference',
+      function (done) {
+        expect(bill.reference).to.be.a.Function;
+        bill.reference(function (error, reference) {
+          expect(error).to.not.exist;
+          expect(reference).to.exist;
+          expect(reference).to.have.length(8);
+          done(error, reference);
+        });
+      });
   });
 
   describe('create', function () {
