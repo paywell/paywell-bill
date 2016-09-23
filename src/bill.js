@@ -17,6 +17,7 @@
 const _ = require('lodash');
 // const async = require('async');
 const redis = require('paywell-redis');
+const wallet = require('paywell-wallet');
 // const phone = require('phone');
 const shortid = require('shortid');
 // const uuid = require('uuid');
@@ -71,6 +72,12 @@ exports.init = function () {
   //initialize warlock
   if (!exports.warlock) {
     exports.warlock = warlock(exports.redis.client());
+  }
+
+  //initialize wallet
+  if (!exports.wallet) {
+    //TODO add ability to pass wallet options
+    exports.wallet = wallet();
   }
 
   //initialize shortid

@@ -5,6 +5,8 @@ const path = require('path');
 const expect = require('chai').expect;
 const redis = require('paywell-redis')();
 const bill = require(path.join(__dirname, '..'))();
+// const customerPhoneNumber = '0714999999';
+// const vendorPhoneNumber = '0714888888';
 
 describe('bill', function () {
   before(function (done) {
@@ -14,6 +16,14 @@ describe('bill', function () {
   it('should be exportable', function () {
     expect(bill).to.exist;
     expect(bill).to.be.an.Object;
+  });
+
+  describe('paycode', function () {
+    it('should be able to generate paycode');
+  });
+
+  describe('reference', function () {
+    it('should be able to generate pay reference');
   });
 
   describe('create', function () {
