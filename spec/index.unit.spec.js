@@ -66,8 +66,18 @@ describe('bill', function () {
             amount: 100,
           };
           bill.create(myBill, function (error, _bill) {
-            console.log(error);
-            console.log(_bill);
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill._id).to.exist;
+            expect(_bill.reference).to.exist;
+            expect(_bill.amount).to.exist;
+            expect(_bill.customer).to.exist;
+            expect(_bill.customer).to.be.an.Object;
+            expect(_bill.vendor).to.exist;
+            expect(_bill.vendor).to.be.an.Object;
+            expect(_bill.customer.balance)
+              .to.be.below(myBill.amount);
+            expect(_bill.createdAt).to.exist;
             done(error, _bill);
           });
         });

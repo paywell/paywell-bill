@@ -166,6 +166,44 @@ exports.reference = function (done) {
 };
 
 
+/**
+ * @function
+ * @name save
+ * @description update existing bill
+ * @param  {Object}   bill valid paywell bill
+ * @param  {Function} done   a callback to invoke on success or failure
+ * @return {Object}          bill or error
+ * @since 0.1.0
+ * @public
+ */
+exports.save = function (bill, done) {
+  //TODO ensure _id exists
+  //TODO obtain save lock
+
+  //prepare save options
+  const options = {
+    collection: exports.defaults.collection,
+    index: true,
+    ignore: ['_id', 'payload']
+  };
+
+  //obtain redis client
+  const client = exports.redis;
+
+  //update timestamps
+  const today = new Date();
+  bill = _.merge({}, bill, {
+    updatedAt: today
+  });
+
+  //persist bill
+  client.hash.save(bill, options, function (error, _bill) {
+    _bill = exports.deserialize(_bill);
+    done(error, _bill);
+  });
+};
+
+
 exports.create = function (options, done) {
   //TODO refactor
   //TODO withdraw in case customer has enough balance?
@@ -226,6 +264,28 @@ exports.create = function (options, done) {
           }
         });
       }
+    },
+
+    function generateBillId(options, next) {
+      // generate bill redis key
+      let key = options.paycode || options.reference;
+      key = exports.redis.key(exports.defaults.collection, key);
+      //extend options with redis key
+      options = _.merge({}, options, { _id: key });
+      next(null, options);
+    },
+
+    function saveBill(bill, next) {
+      //prepare save options
+      const today = new Date();
+
+      //set creation timestamp
+      bill = _.merge({}, bill, {
+        createdAt: today
+      });
+
+      //persist wallet
+      exports.save(bill, next);
     }
 
   ], function (error, bill) {
