@@ -16,6 +16,23 @@ bills for paywell virtual wallet
 $ npm install --save paywell-bill
 ```
 
+## Usage
+```js
+const bill = require('paywell-bill')();
+
+//create new bill
+bill.create(options,done);
+
+//get existing bill
+bill.get(options,done);
+
+//pay bill using paycode
+bill.pay(paycode,done);
+
+//pay bill using pay reference
+bill.pay(reference,done);
+```
+
 ## Bill Structure
 ```js
 {
