@@ -87,6 +87,13 @@ exports.init = function () {
 };
 
 
+exports.key = function (referenceOrPaycode) {
+  let key = referenceOrPaycode;
+  key = exports.redis.key(exports.defaults.collection, referenceOrPaycode);
+  return key;
+};
+
+
 /**
  * @function
  * @name deserialize
@@ -163,6 +170,61 @@ exports.reference = function (done) {
   exports.wallet.shortid(function (error, reference) {
     done(error, reference);
   });
+};
+
+
+/**
+ * @function
+ * @name get
+ * @description get bill(s)
+ * @param  {String|String[]|Object} options reference(s) or paycode(s) or phone number(s)
+ * @param  {Function} done a callback to invoke on success or failure
+ * @return {Object|Object[]}        collection or single bills
+ * @since 0.1.0
+ * @public
+ */
+exports.get = function (options, done) {
+  //TODO throw error in case of missing bill
+  //get specific bill(s)
+  const client = exports.redis;
+
+  async.waterfall([
+
+    function ensureBillKey(next) {
+      //prepare paycode(s) or reference(s) collection
+      let keys = [].concat(options);
+      //convert bill paycode or reference to bill keys
+      keys = _.map(keys, function (_option) {
+        return exports.key(_option);
+      });
+      next(null, keys);
+    },
+
+    function getBill(keys, next) {
+      client.hash.get(keys, next);
+    },
+
+    function deserializeBill(bills, next) {
+
+      //deserialize bills
+      if (_.isArray(bills)) {
+        bills = _.map(bills, function (bill) {
+          bill = exports.deserialize(bill);
+          return bill;
+        });
+      }
+
+      //deserialize bill
+      else {
+        bills = exports.deserialize(bills);
+      }
+
+      next(null, bills);
+    }
+  ], function (error, bills) {
+    done(error, bills);
+  });
+
 };
 
 
@@ -271,7 +333,7 @@ exports.create = function (options, done) {
     function generateBillId(options, next) {
       // generate bill redis key
       let key = options.paycode || options.reference;
-      key = exports.redis.key(exports.defaults.collection, key);
+      key = exports.key(key);
       //extend options with redis key
       options = _.merge({}, options, { _id: key });
       next(null, options);
@@ -295,5 +357,68 @@ exports.create = function (options, done) {
 
   ], function (error, bill) {
     done(error, bill);
+  });
+};
+
+
+exports.pay = function (options, done) {
+  //TODO obtain lock for both wallet and bill during pay
+  //TODO handle bill with no amount(i.e topups)
+  //TODO allow pay using paycode or reference
+  //TODO what if payment is below due amount
+  //TODO refactor
+
+  //ensure options
+  options = _.merge({}, options);
+
+  async.waterfall([
+
+    function getBill(next) {
+      exports.get(options.paycode || options.reference, next);
+    },
+
+    function payBill(_bill, next) {
+      //pay using paycode(wallet)
+      if (_bill.paycode) {
+        //TODO ensure same paycode?
+        const today = new Date();
+
+        //set paid date
+        _bill = _.merge({}, _bill, {
+          paidAt: today,
+          updatedAt: today
+        });
+
+        const withdraw = {
+          phoneNumber: _bill.customer.phoneNumber,
+          amount: _bill.amount
+        };
+
+        //TODO ensure single lock for both _bill and withdraw
+        //withdraw from wallet
+        exports.wallet.withdraw(withdraw, function (error /*, wallet*/ ) {
+          if (error) {
+            next(error);
+          } else {
+            //update _bill
+            exports.save(_bill, next);
+          }
+        });
+      }
+
+      //pay using reference
+      //TODO implement
+      else {
+        next(null, _bill);
+      }
+    },
+
+    function finalizeBill(_bill, next) {
+      // TODO notify vendor about payments (sms & callback url)
+      // once bill full paid or partially paid
+      next(null, _bill);
+    }
+  ], function (error, _bill) {
+    done(error, _bill);
   });
 };

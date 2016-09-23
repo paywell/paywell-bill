@@ -158,18 +158,113 @@ describe('bill', function () {
   });
 
   describe('get', function () {
-    it('should be able to get bill');
+    const myBill = {
+      vendor: vendorPhoneNumber,
+      customer: customerPhoneNumber,
+      amount: 100,
+    };
+    let paycodeOrReference;
+    before(function (done) {
+      redis.clear(done);
+    });
+
+    before(function (done) {
+      bill.create(myBill, function (error, _bill) {
+        paycodeOrReference = _bill.reference || _bill.paycode;
+        done(error, _bill);
+      });
+    });
+
+    it(
+      'should be able to get bill using paycode or reference',
+      function (done) {
+        bill.get(paycodeOrReference, function (error, _bill) {
+          expect(error).to.not.exist;
+          expect(_bill).to.exist;
+          expect(_bill._id).to.exist;
+          expect(_bill.customer).to.exist;
+          expect(_bill.vendor).to.exist;
+          expect(_bill.amount).to.exist;
+          expect(_bill.amount).to.be.equal(myBill.amount);
+          expect(_bill.reference).to.be.equal(paycodeOrReference);
+          done(error, _bill);
+        });
+      });
+
     it(
       'should be able to get bills of a given wallet using phone number'
     );
+
+    after(function (done) {
+      redis.clear(done);
+    });
   });
 
   describe('pay', function () {
-    it('should be able to pay bill');
+    before(function (done) {
+      redis.clear(done);
+    });
+
+    describe('with enough wallet balance', function () {
+      let paycode;
+      before(function (done) {
+        redis.clear(done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(customerPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(vendorPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.deposit({
+          phoneNumber: customerPhoneNumber,
+          amount: 400
+        }, function (error, _wallet) {
+          done(error, _wallet);
+        });
+      });
+
+      before(function (done) {
+        const myBill = {
+          vendor: vendorPhoneNumber,
+          customer: customerPhoneNumber,
+          amount: 100,
+        };
+        bill.create(myBill, function (error, _bill) {
+          paycode = _bill.paycode;
+          done(error, _bill);
+        });
+      });
+
+      it(
+        'should be able to pay bill with paycode',
+        function (done) {
+          bill.pay({ paycode }, function (error, _bill) {
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill.paidAt).to.exist;
+            done(error, _bill);
+          });
+        });
+
+      after(function (done) {
+        redis.clear(done);
+      });
+    });
+
     it('should be able to pay bill by installments');
     it('should be able to notify bill about due');
     it('should be able to notify bill past due');
     it('should notify vendor once bill cleared');
+
+    after(function (done) {
+      redis.clear(done);
+    });
+
   });
 
   describe('search', function () {
