@@ -51,7 +51,7 @@ describe('bill', function () {
       redis.clear(done);
     });
 
-    describe('no enough balance', function () {
+    describe('without enough balance', function () {
 
       before(function (done) {
         redis.clear(done);
@@ -77,6 +77,69 @@ describe('bill', function () {
             expect(_bill.vendor).to.be.an.Object;
             expect(_bill.customer.balance)
               .to.be.below(myBill.amount);
+            expect(_bill.createdAt).to.exist;
+            done(error, _bill);
+          });
+        });
+
+      after(function (done) {
+        redis.clear(done);
+      });
+    });
+
+    describe('with enough balance', function () {
+
+      before(function (done) {
+        redis.clear(done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(customerPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(vendorPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.deposit({
+          phoneNumber: customerPhoneNumber,
+          amount: 400
+        }, function (error, _wallet) {
+          done(error, _wallet);
+        });
+      });
+
+      before(function (done) {
+        bill.wallet.get(
+          customerPhoneNumber,
+          function (error, _wallet) {
+            console.log(_wallet);
+            done(error, _wallet);
+          });
+      });
+
+      it(
+        'should be able to create bill',
+        function (done) {
+          const myBill = {
+            vendor: vendorPhoneNumber,
+            customer: customerPhoneNumber,
+            amount: 100,
+          };
+          bill.create(myBill, function (error, _bill) {
+            console.log(_bill);
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill._id).to.exist;
+            expect(_bill.paycode).to.exist;
+            expect(_bill.amount).to.exist;
+            expect(_bill.customer).to.exist;
+            expect(_bill.customer).to.be.an.Object;
+            expect(_bill.vendor).to.exist;
+            expect(_bill.vendor).to.be.an.Object;
+            expect(_bill.customer.balance)
+              .to.be.above(myBill.amount);
             expect(_bill.createdAt).to.exist;
             done(error, _bill);
           });

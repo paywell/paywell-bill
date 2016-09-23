@@ -243,6 +243,8 @@ exports.create = function (options, done) {
         !!options.customer.balance &&
         options.customer.balance >= options.amount;
 
+      console.log(customerHasEnoughBalance);
+
       //generate paycode
       if (customerHasEnoughBalance) {
         exports.paycode(function (error, paycode) {
