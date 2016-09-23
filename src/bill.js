@@ -366,6 +366,7 @@ exports.pay = function (options, done) {
   //TODO handle bill with no amount(i.e topups)
   //TODO allow pay using paycode or reference
   //TODO what if payment is below due amount
+  //TODO check if bill already paid
   //TODO refactor
 
   //ensure options
