@@ -26,6 +26,9 @@ bill.create(options,done);
 //get existing bill
 bill.get(options,done);
 
+//save or update existing bill
+bill.save(_bill,done);
+
 //pay bill using paycode
 bill.pay(paycode,done);
 
