@@ -5,8 +5,8 @@ const path = require('path');
 const expect = require('chai').expect;
 const redis = require('paywell-redis')();
 const bill = require(path.join(__dirname, '..'))();
-// const customerPhoneNumber = '0714999999';
-// const vendorPhoneNumber = '0714888888';
+const customerPhoneNumber = '0714999999';
+const vendorPhoneNumber = '0714888888';
 
 describe('bill', function () {
   before(function (done) {
@@ -47,10 +47,51 @@ describe('bill', function () {
   });
 
   describe('create', function () {
-    it('should be able to create bill');
+    before(function (done) {
+      redis.clear(done);
+    });
+
+    describe('no enough balance', function () {
+
+      before(function (done) {
+        redis.clear(done);
+      });
+
+      it(
+        'should be able to create bill',
+        function (done) {
+          const myBill = {
+            vendor: vendorPhoneNumber,
+            customer: customerPhoneNumber,
+            amount: 100,
+          };
+          bill.create(myBill, function (error, _bill) {
+            console.log(error);
+            console.log(_bill);
+            done(error, _bill);
+          });
+        });
+
+      after(function (done) {
+        redis.clear(done);
+      });
+    });
+
+    it('should ensure verified vendor wallet before create bill');
+    it('should ensure customer wallet before create bill');
     it('should be able to generate bill pay reference');
     it('should be able to generate bill onetime paycode');
     it('should be able to notify customer on new bill');
+    it(
+      'should support FIFO withdraw to prevent latest bill to get paycode'
+    );
+    it(
+      'should ensure states as time of bill persisted with bill'
+    );
+
+    after(function (done) {
+      redis.clear(done);
+    });
   });
 
   describe('get', function () {

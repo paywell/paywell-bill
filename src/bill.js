@@ -15,7 +15,7 @@
 
 //dependencies
 const _ = require('lodash');
-// const async = require('async');
+const async = require('async');
 const redis = require('paywell-redis');
 const wallet = require('paywell-wallet');
 // const phone = require('phone');
@@ -162,5 +162,73 @@ exports.reference = function (done) {
   //TODO shuffle with wallet phone number to ensure per wallet unique reference
   exports.wallet.shortid(function (error, reference) {
     done(error, reference);
+  });
+};
+
+
+exports.create = function (options, done) {
+  //TODO refactor
+  //TODO withdraw in case customer has enough balance?
+  //TODO should lock wallet during bill creation
+  //ensure options
+  options = _.merge({}, options);
+
+  async.waterfall([
+
+    function validateOptions(next) {
+      // TODO implement validation
+      next(null, options);
+    },
+
+    function ensureWallets(options, next) {
+      async.parallel({
+        customer: function getOrCreateCustomerWallet(next) {
+          //TODO should we send activation SMS if not activated?
+          exports.wallet.create(options.customer, next);
+        },
+        vendor: function getOrCreateVendorWallet(next) {
+          //TODO should we send activation SMS if not activated?
+          //TODO vendor wallet must already be verified
+          exports.wallet.create(options.vendor, next);
+        }
+      }, function (error, wallets) {
+        //TODO pick only specific fields from wallets
+        //merge wallet details
+        options = _.merge({}, options, wallets);
+        next(error, options);
+      });
+    },
+
+    function generatePayCodeOrReference(options, next) {
+      //check if customer has enough balance
+      const customerHasEnoughBalance = !!options.customer &&
+        !!options.customer.balance &&
+        options.customer.balance >= options.amount;
+
+      //generate paycode
+      if (customerHasEnoughBalance) {
+        exports.paycode(function (error, paycode) {
+          //extend options with paycode
+          if (!!paycode) {
+            options = _.merge({}, options, { paycode: paycode });
+          }
+          next(error, options);
+        });
+      }
+
+      //generate pay reference
+      else {
+        exports.reference(function (error, reference) {
+          //extend options with reference
+          options = _.merge({}, options, { reference: reference });
+          if (!!reference) {
+            next(error, options);
+          }
+        });
+      }
+    }
+
+  ], function (error, bill) {
+    done(error, bill);
   });
 };
