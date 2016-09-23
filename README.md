@@ -41,15 +41,6 @@ $ npm install --save paywell-bill
     - should provide what is the current balance and what amount has remained for the bill to be cleared 
 - A paycode will be used to pay if wallet has enough balance to pay
 
-
-## TODO
-- [ ] should be able to generate pay reference
-- [ ] should be able to generate paycode
-- [ ] should be able to save bill
-- [ ] should be able to clear bill
-- [ ] should be able to send paycode over sms
-- [ ] should be able to send pay reference over paycode
-
 ## Testing
 * Clone this repository
 
