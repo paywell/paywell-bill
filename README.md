@@ -19,15 +19,20 @@ $ npm install --save paywell-bill
 ## Bill Structure
 ```js
 {
-    vendor:String,
-    customer:String,
+    vendor:String, //in E.164
+    customer:String, //in E.164
     amount:Number,
     uuid:String,
     paycode:String,
     reference:String
     createdAt:Date,
     duedAt:Date,
-    paidAt:Date
+    paidAt:Date,
+    provider:{
+        name:String,
+        country:String,
+        currency:String
+    }
 }
 ```
 
