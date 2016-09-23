@@ -220,14 +220,14 @@ exports.create = function (options, done) {
 
     function ensureWallets(options, next) {
       async.parallel({
-        customer: function getOrCreateCustomerWallet(next) {
+        customer: function getOrCreateCustomerWallet(after) {
           //TODO should we send activation SMS if not activated?
-          exports.wallet.create(options.customer, next);
+          exports.wallet.create(options.customer, after);
         },
-        vendor: function getOrCreateVendorWallet(next) {
+        vendor: function getOrCreateVendorWallet(after) {
           //TODO should we send activation SMS if not activated?
           //TODO vendor wallet must already be verified
-          exports.wallet.create(options.vendor, next);
+          exports.wallet.create(options.vendor, after);
         }
       }, function (error, wallets) {
         //TODO pick only specific fields from wallets
@@ -242,8 +242,6 @@ exports.create = function (options, done) {
       const customerHasEnoughBalance = !!options.customer &&
         !!options.customer.balance &&
         options.customer.balance >= options.amount;
-
-      console.log(customerHasEnoughBalance);
 
       //generate paycode
       if (customerHasEnoughBalance) {

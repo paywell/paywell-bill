@@ -48,7 +48,7 @@
     "lodash": "^4.16.1",
     "moment": "^2.15.1",
     "paywell-redis": "^0.4.0",
-    "paywell-wallet": "^0.1.1",
+    "paywell-wallet": "^0.1.2",
     "paywell-xml": "^0.1.0",
     "phone": "git+https://github.com/lykmapipo/phone.git",
     "redis": "^2.6.2",
