@@ -1,11 +1,19 @@
 'use strict';
 
-//dependenncies
+//dependencies
+const path = require('path');
+const expect = require('chai').expect;
 const redis = require('paywell-redis')();
+const bill = require(path.join(__dirname, '..'))();
 
 describe('bill', function () {
   before(function (done) {
     redis.clear(done);
+  });
+
+  it('should be exportable', function () {
+    expect(bill).to.exist;
+    expect(bill).to.be.an.Object;
   });
 
   describe('create', function () {

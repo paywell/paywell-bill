@@ -4,7 +4,7 @@
   "description": "bills for paywell virtual wallet",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test",
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
