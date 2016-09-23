@@ -179,6 +179,7 @@ exports.reference = function (done) {
 exports.save = function (bill, done) {
   //TODO ensure _id exists
   //TODO obtain save lock
+  //TODO store wallet bills in sorted set 
 
   //prepare save options
   const options = {
@@ -192,9 +193,10 @@ exports.save = function (bill, done) {
 
   //update timestamps
   const today = new Date();
-  bill = _.merge({}, bill, {
-    updatedAt: today
-  });
+  bill = _.merge({}, {
+    updatedAt: today,
+    createdAt: today
+  }, bill);
 
   //persist bill
   client.hash.save(bill, options, function (error, _bill) {
@@ -281,11 +283,14 @@ exports.create = function (options, done) {
 
       //set creation timestamp
       bill = _.merge({}, bill, {
-        createdAt: today
+        createdAt: today,
+        updatedAt: today
       });
 
       //persist wallet
       exports.save(bill, next);
+
+      //TODO send paycode or pay reference
     }
 
   ], function (error, bill) {

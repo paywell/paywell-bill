@@ -119,19 +119,18 @@ describe('bill', function () {
             amount: 100,
           };
           bill.create(myBill, function (error, _bill) {
-            console.log(_bill);
-            // expect(error).to.not.exist;
-            // expect(_bill).to.exist;
-            // expect(_bill._id).to.exist;
-            // expect(_bill.paycode).to.exist;
-            // expect(_bill.amount).to.exist;
-            // expect(_bill.customer).to.exist;
-            // expect(_bill.customer).to.be.an.Object;
-            // expect(_bill.vendor).to.exist;
-            // expect(_bill.vendor).to.be.an.Object;
-            // expect(_bill.customer.balance)
-            //   .to.be.above(myBill.amount);
-            // expect(_bill.createdAt).to.exist;
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill._id).to.exist;
+            expect(_bill.paycode).to.exist;
+            expect(_bill.amount).to.exist;
+            expect(_bill.customer).to.exist;
+            expect(_bill.customer).to.be.an.Object;
+            expect(_bill.vendor).to.exist;
+            expect(_bill.vendor).to.be.an.Object;
+            expect(_bill.customer.balance)
+              .to.be.above(myBill.amount);
+            expect(_bill.createdAt).to.exist;
             done(error, _bill);
           });
         });
@@ -147,7 +146,7 @@ describe('bill', function () {
     it('should be able to generate bill onetime paycode');
     it('should be able to notify customer on new bill');
     it(
-      'should support FIFO withdraw to prevent latest bill to get paycode'
+      'should support FIFO withdraw'
     );
     it(
       'should ensure states as time of bill persisted with bill'
@@ -160,6 +159,9 @@ describe('bill', function () {
 
   describe('get', function () {
     it('should be able to get bill');
+    it(
+      'should be able to get bills of a given wallet using phone number'
+    );
   });
 
   describe('pay', function () {
