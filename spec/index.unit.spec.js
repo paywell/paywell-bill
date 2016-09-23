@@ -10,7 +10,9 @@ describe('bill', function () {
 
   describe('create', function () {
     it('should be able to create bill');
-    it('should generate bill onetime paycode');
+    it('should be able to generate bill pay reference');
+    it('should be able to generate bill onetime paycode');
+    it('should be able to notify customer on new bill');
   });
 
   describe('get', function () {
@@ -20,6 +22,8 @@ describe('bill', function () {
   describe('pay', function () {
     it('should be able to pay bill');
     it('should be able to pay bill by installments');
+    it('should be able to notify bill about due');
+    it('should be able to notify bill past due');
     it('should notify vendor once bill cleared');
   });
 
