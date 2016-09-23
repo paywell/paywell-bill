@@ -115,6 +115,21 @@ exports.deserialize = function (bill) {
   return bill;
 };
 
+
+/**
+ * @function
+ * @name paycode
+ * @description generate a paycode that will be used by a wallet to clear a bill
+ *              using wallet existing balance.
+ *              
+ *              This is only happen if a current wallet balance is enough
+ *              balance to clear a bill.
+ *              
+ * @param  {Function} done a callback to be invoked on success or failure
+ * @return {String|Error}        paycode or error
+ * @since 0.1.0
+ * @public
+ */
 exports.paycode = function (done) {
   //TODO should it be only number?
   //TODO store them in redis set to ensure uniqueness
@@ -125,11 +140,26 @@ exports.paycode = function (done) {
   });
 };
 
+
+/**
+ * @function
+ * @name reference
+ * @description generate a pay reference that will be used by a wallet owner to 
+ *              clear bill using external physical wallets i.e mobile money etc.
+ *              
+ *              This is only happen if a current wallet balance is not enough
+ *              to clear a bill.
+ *              
+ * @param  {Function} done a callback to be invoked on success or failure
+ * @return {String|Error}        pay reference or error
+ * @since 0.1.0
+ * @public
+ */
 exports.reference = function (done) {
   //TODO should it be only number?
   //TODO store them in redis set to ensure uniqueness
   //TODO try use redis INCRBY to generate daily paycode
-  //TODO shuffle with wallet phone number to ensure per wallet unique paycode
+  //TODO shuffle with wallet phone number to ensure per wallet unique reference
   exports.wallet.shortid(function (error, reference) {
     done(error, reference);
   });
