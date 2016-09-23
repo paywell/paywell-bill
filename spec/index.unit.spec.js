@@ -10,10 +10,17 @@ describe('bill', function () {
 
   describe('create', function () {
     it('should be able to create bill');
+    it('should generate bill onetime paycode');
   });
 
   describe('get', function () {
     it('should be able to get bill');
+  });
+
+  describe('pay', function () {
+    it('should be able to pay bill');
+    it('should be able to pay bill by installments');
+    it('should notify vendor once bill cleared');
   });
 
   describe('search', function () {
