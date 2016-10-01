@@ -34,6 +34,9 @@ bill.pay(paycode,done);
 
 //pay bill using pay reference
 bill.pay(reference,done);
+
+//fail bill
+bill.fail(_bill, done);
 ```
 
 ## Bill Structure
@@ -44,14 +47,18 @@ bill.pay(reference,done);
     amount:Number,
     uuid:String,
     paycode:String,
-    reference:String
+    reference:String,
     createdAt:Date,
     duedAt:Date,
     paidAt:Date,
+    failedAt:Date, //signal bill pay failure
     provider:{
         name:String,
         country:String,
-        currency:String
+        currency:String,
+        paycode:String,
+        shortcode:String,
+        status:String
     }
 }
 ```

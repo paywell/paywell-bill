@@ -116,7 +116,8 @@ exports.deserialize = function (bill) {
     createdAt: bill.createdAt ? new Date(bill.createdAt) : undefined,
     updatedAt: bill.updatedAt ? new Date(bill.updatedAt) : undefined,
     duedAt: bill.verifiedAt ? new Date(bill.verifiedAt) : undefined,
-    paidAt: bill.activatedAt ? new Date(bill.activatedAt) : undefined,
+    paidAt: bill.paidAt ? new Date(bill.paidAt) : undefined,
+    failedAt: bill.failedAt ? new Date(bill.failedAt) : undefined,
   });
 
   return bill;
@@ -241,7 +242,8 @@ exports.get = function (options, done) {
 exports.save = function (bill, done) {
   //TODO ensure _id exists
   //TODO obtain save lock
-  //TODO store wallet bills in sorted set 
+  //TODO store wallet bills in sorted set
+  //TODO update bill sorted set scores(deletedAt, createdAt, paidAt, duedAt) 
 
   //prepare save options
   const options = {
@@ -270,6 +272,7 @@ exports.save = function (bill, done) {
 
 exports.create = function (options, done) {
   //TODO refactor
+  //TODO should accept paycode or reference send option
   //TODO withdraw in case customer has enough balance?
   //TODO should lock wallet during bill creation
   //ensure options
@@ -319,6 +322,7 @@ exports.create = function (options, done) {
       }
 
       //generate pay reference
+      //TODO if pay reference exist dont generate
       else {
         exports.reference(function (error, reference) {
           //extend options with reference
@@ -426,4 +430,13 @@ exports.pay = function (options, done) {
   ], function (error, _bill) {
     done(error, _bill);
   });
+};
+
+
+exports.fail = function (_bill, done) {
+  //ensure bill
+  _bill = _.merge({}, { failedAt: new Date() }, _bill);
+
+  //update bill
+  exports.save(_bill, done);
 };

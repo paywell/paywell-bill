@@ -312,6 +312,165 @@ describe('bill', function () {
 
   });
 
+  describe('pay', function () {
+    before(function (done) {
+      redis.clear(done);
+    });
+
+    describe('without enough wallet balance', function () {
+      let reference;
+      before(function (done) {
+        redis.clear(done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(customerPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(vendorPhoneNumber, done);
+      });
+
+      before(function (done) {
+        const myBill = {
+          vendor: vendorPhoneNumber,
+          customer: customerPhoneNumber,
+          amount: 100,
+        };
+        bill.create(myBill, function (error, _bill) {
+          reference = _bill.reference;
+          done(error, _bill);
+        });
+      });
+
+      it(
+        'should be able to pay bill with pay reference',
+        function (done) {
+          bill.pay({ reference }, function (error, _bill) {
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill.paidAt).to.exist;
+            done(error, _bill);
+          });
+        });
+
+      after(function (done) {
+        redis.clear(done);
+      });
+    });
+
+    describe('with enough wallet balance', function () {
+      let paycode;
+      before(function (done) {
+        redis.clear(done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(customerPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.create(vendorPhoneNumber, done);
+      });
+
+      before(function (done) {
+        bill.wallet.deposit({
+          phoneNumber: customerPhoneNumber,
+          amount: 400
+        }, function (error, _wallet) {
+          done(error, _wallet);
+        });
+      });
+
+      before(function (done) {
+        const myBill = {
+          vendor: vendorPhoneNumber,
+          customer: customerPhoneNumber,
+          amount: 100,
+        };
+        bill.create(myBill, function (error, _bill) {
+          paycode = _bill.paycode;
+          done(error, _bill);
+        });
+      });
+
+      it(
+        'should be able to pay bill with paycode',
+        function (done) {
+          bill.pay({ paycode }, function (error, _bill) {
+            expect(error).to.not.exist;
+            expect(_bill).to.exist;
+            expect(_bill.paidAt).to.exist;
+            done(error, _bill);
+          });
+        });
+
+      after(function (done) {
+        redis.clear(done);
+      });
+    });
+
+    it(
+      'should be ensure paycode or pay reference can used only once in case bill has due amount'
+    );
+    it('should be able to pay bill by installments');
+    it('should be able to notify bill about due');
+    it('should be able to notify bill past due');
+    it('should notify vendor once bill cleared');
+
+    after(function (done) {
+      redis.clear(done);
+    });
+
+  });
+
+  describe('fail', function () {
+    let bill_;
+    before(function (done) {
+      redis.clear(done);
+    });
+
+    before(function (done) {
+      bill.wallet.create(customerPhoneNumber, done);
+    });
+
+    before(function (done) {
+      bill.wallet.create(vendorPhoneNumber, done);
+    });
+
+    before(function (done) {
+      const myBill = {
+        vendor: vendorPhoneNumber,
+        customer: customerPhoneNumber,
+        amount: 100,
+      };
+      bill.create(myBill, function (error, _bill) {
+        bill_ = _bill;
+        done(error, _bill);
+      });
+    });
+
+    it('should be able to set failedAt timestamp', function (done) {
+      bill.fail(bill_, function (error, _bill) {
+        expect(error).to.not.exist;
+        expect(_bill).to.exist;
+        expect(_bill.failedAt).to.exist;
+        expect(_bill.failedAt).to.be.a.Date;
+        done(error, _bill);
+      });
+    });
+
+    after(function (done) {
+      redis.clear(done);
+    });
+
+  });
+
+  describe('status', function () {
+    it('should be able to set bill status');
+    it('should be able to trace bill using status');
+  });
+
   describe('search', function () {
     it('should be able to search bill(s)');
   });
